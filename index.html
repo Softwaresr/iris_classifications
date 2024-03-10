@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iris Species Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Iris Species Prediction</h1>
+        <form id="irisForm">
+            <label for="sepalLength">Sepal Length:</label>
+            <input type="text" id="sepalLength" required>
+            <label for="sepalWidth">Sepal Width:</label>
+            <input type="text" id="sepalWidth" required>
+            <label for="petalLength">Petal Length:</label>
+            <input type="text" id="petalLength" required>
+            <label for="petalWidth">Petal Width:</label>
+            <input type="text" id="petalWidth" required>
+            <button type="submit">Predict</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('irisForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            var sepalLength = parseFloat(document.getElementById('sepalLength').value);
+            var sepalWidth = parseFloat(document.getElementById('sepalWidth').value);
+            var petalLength = parseFloat(document.getElementById('petalLength').value);
+            var petalWidth = parseFloat(document.getElementById('petalWidth').value);
+            
+            var data = [sepalLength, sepalWidth, petalLength, petalWidth];
+
+            // Use AJAX to send data to server for prediction
+            var xhrTree = new XMLHttpRequest();
+            xhrTree.open('POST', '/predict_tree', true);
+            xhrTree.setRequestHeader('Content-Type', 'application/json');
+            xhrTree.onreadystatechange = function() {
+                if (xhrTree.readyState == 4 && xhrTree.status == 200) {
+                    var resultTree = JSON.parse(xhrTree.responseText);
+                    document.getElementById('result').innerText = 'Decision Tree Prediction: ' + resultTree.prediction;
+                }
+            };
+            xhrTree.send(JSON.stringify({data: data}));
+
+            var xhrKNN = new XMLHttpRequest();
+            xhrKNN.open('POST', '/predict_knn', true);
+            xhrKNN.setRequestHeader('Content-Type', 'application/json');
+            xhrKNN.onreadystatechange = function() {
+                if (xhrKNN.readyState == 4 && xhrKNN.status == 200) {
+                    var resultKNN = JSON.parse(xhrKNN.responseText);
+                    document.getElementById('result').innerText += ', KNN Prediction: ' + resultKNN.prediction;
+                }
+            };
+            xhrKNN.send(JSON.stringify({data: data}));
+        });
+    </script>
+</body>
+</html>
